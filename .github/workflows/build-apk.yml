@@ -19,11 +19,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Capacitor
+      - name: Install Capacitor (Fixed Version)
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          npm install @capacitor/filesystem @capacitor/storage
+          npm install @capacitor/core@5.7.0 @capacitor/cli@5.7.0 @capacitor/android@5.7.0
 
       - name: Copy Web Files to Capacitor
         run: |
@@ -39,7 +38,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build Android APK (Debug)
+      - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
