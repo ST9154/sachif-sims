@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#0f2c38">
+    <title>SIMS - SACHIF Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f5f9fc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            max-width: 480px;
+            width: 100%;
+            height: 100vh;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f2c38 0%, #1b4f6e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 36px;
+            padding: 32px 24px;
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .login-card i {
+            font-size: 56px;
+            color: #e67e22;
+            margin-bottom: 16px;
+        }
+
+        .login-card h2 {
+            color: #0f2c38;
+            margin-bottom: 24px;
+        }
+
+        .login-input, .role-select {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 28px;
+            font-size: 14px;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 28px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .demo-creds {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f0f7f0;
+            border-radius: 16px;
+            font-size: 11px;
+            text-align: left;
+        }
+
+        .demo-creds p {
+            margin: 4px 0;
+            font-family: monospace;
+        }
+
+        /* App Header */
+        .app-header {
+            background: #0f2c38;
+            color: white;
+            padding: 16px 20px 12px;
+            border-radius: 0 0 24px 24px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-badge {
+            background: #e67e22;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .logout-icon {
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: 12px;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            margin: 12px 16px;
+            padding: 16px;
+            border-radius: 20px;
+            color: white;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 12px 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            color: #6c7a8a;
+            cursor: pointer;
+        }
+
+        .nav-btn i {
+            font-size: 20px;
+        }
+
+        .nav-btn.active {
+            color: #e67e22;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 70px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 28px;
+            color: #e67e22;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            display: block;
+            margin-bottom: 6px;
+            color: #2c3e44;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d0d9e8;
+            border-radius: 28px;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: #e67e22;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-secondary {
+            background: #2c3e50;
+        }
+
+        .btn-info {
+            background: #3498db;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+            cursor: pointer;
+        }
+
+        .priority-urgent {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .priority-high {
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .priority-low {
+            color: #27ae60;
+        }
+
+        .alert-badge {
+            background: #fee2e2;
+            border-left: 4px solid #e74c3c;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #f39c12;
+            color: white;
+        }
+
+        .status-accepted {
+            background: #3498db;
+            color: white;
+        }
+
+        .status-resolved {
+            background: #27ae60;
+            color: white;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 75px;
+            right: 16px;
+            background: #e67e22;
+            width: 52px;
+            height: 52px;
+            border-radius: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10;
+            border: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 85%;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .incident-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-left: 4px solid #e74c3c;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .incident-resolved {
+            border-left-color: #27ae60;
+            opacity: 0.8;
+        }
+
+        .search-bar {
+            margin-bottom: 16px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 14px;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .edit-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: 6px;
+        }
+
+        .action-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+            margin-right: 8px;
+        }
+
+        .delete-incident-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        footer {
+            font-size: 0.6rem;
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <i class="fas fa-hands-helping"></i>
+            <h2>SACHIF SIMS</h2>
+            
+            <select id="roleSelect" class="role-select">
+                <option value="admin">👑 Admin / Manager</option>
+                <option value="socialworker">👤 Social Worker</option>
+                <option value="responder">🚑 Responder</option>
+            </select>
+            
+            <input type="text" id="username" class="login-input" placeholder="Email / Username">
+            <input type="password" id="password" class="login-input" placeholder="Password">
+            
+            <button class="login-btn" onclick="doLogin()">Login →</button>
+            
+            <div id="loginError" class="error-msg"></div>
+            
+            <div class="demo-creds">
+                <strong>Demo Credentials:</strong>
+                <p>👑 Admin: sipho@sims.com / sipho123</p>
+                <p>👤 Social Worker: worker@sims.com / worker123</p>
+                <p>🚑 Responder: responder@sims.com / responder123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" style="display: none; flex-direction: column; height: 100%;">
+        <div class="app-header">
+            <div class="header-top">
+                <h1><i class="fas fa-shield-alt"></i> SIMS</h1>
+                <div>
+                    <span class="user-badge" id="roleBadge"></span>
+                    <i class="fas fa-sign-out-alt logout-icon" onclick="doLogout()"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="welcome-banner" id="welcomeBanner"></div>
+
+        <div class="main-content" id="mainContent"></div>
+
+        <div class="bottom-nav" id="bottomNav"></div>
+        
+        <button class="fab" id="fabBtn" style="display: none;"><i class="fas fa-plus"></i> Add Child</button>
+    </div>
+</div>
+
+<script>
+    let currentUser = null;
+    let currentScreen = 'dashboard';
+
+    function getData(key) { 
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : [];
+    }
+    
+    function setData(key, data) { 
+        localStorage.setItem(key, JSON.stringify(data)); 
+    }
+
+    function initData() {
+        if (!localStorage.getItem('users')) {
+            setData('users', [
+                { id: 'U001', username: 'sipho@sims.com', password: 'sipho123', name: 'Sipho Admin', role: 'admin' },
+                { id: 'U002', username: 'worker@sims.com', password: 'worker123', name: 'Sipho Moloi', role: 'socialworker' },
+                { id: 'U003', username: 'responder@sims.com', password: 'responder123', name: 'Thabo Nkosi', role: 'responder' }
+            ]);
+        }
+        if (!localStorage.getItem('beneficiaries')) {
+            setData('beneficiaries', [
+                { id: "B001", firstName: "Lerato", lastName: "Jonga", dob: "2015-04-12", guardian: "Mmapula Jonga", contact: "0781234567", address: "1234 Soweto Street, Soweto", regDate: new Date().toISOString(), registeredBy: "U002" },
+                { id: "B002", firstName: "Thabo", lastName: "Nkosi", dob: "2014-08-22", guardian: "Phindile Nkosi", contact: "0789876543", address: "45 Orlando East, Soweto", regDate: new Date().toISOString(), registeredBy: "U002" }
+            ]);
+        }
+        if (!localStorage.getItem('incidents')) {
+            setData('incidents', [
+                { id: 101, childId: "B001", childName: "Lerato Jonga", type: "Physical Harm", priority: "Urgent", status: "pending", date: new Date().toISOString(), location: "1234 Soweto Street, Soweto", description: "Child found with bruises", reportedBy: "U002", reportedByName: "Sipho Moloi" }
+            ]);
+        }
+        if (!localStorage.getItem('inventory')) {
+            setData('inventory', [
+                { id: "R001", item: "Maize Meal", quantity: 340, reorderLevel: 100 },
+                { id: "R002", item: "Educational Books", quantity: 120, reorderLevel: 40 }
+            ]);
+        }
+        if (!localStorage.getItem('serviceLogs')) {
+            setData('serviceLogs', []);
+        }
+        if (!localStorage.getItem('caseNotes')) {
+            setData('caseNotes', []);
+        }
+    }
+
+    // ==================== LOGIN ====================
+    function doLogin() {
+        const role = document.getElementById('roleSelect').value;
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        initData();
+        const users = getData('users');
+        const user = users.find(u => u.username === username && u.password === password && u.role === role);
+
+        if (user) {
+            currentUser = user;
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'flex';
+            document.getElementById('roleBadge').innerHTML = user.role === 'admin' ? '👑 Admin' : (user.role === 'socialworker' ? '👤 Social Worker' : '🚑 Responder');
+            document.getElementById('welcomeBanner').innerHTML = '<h3>Welcome, ' + user.name + '!</h3><p>' + (user.role === 'admin' ? 'Managing SACHIF operations' : (user.role === 'socialworker' ? 'Protecting children in Gauteng' : 'Ready for emergency response')) + '</p>';
+            renderNav();
+            renderScreen('dashboard');
+        } else {
+            document.getElementById('loginError').innerHTML = 'Invalid credentials. Check username/password and role.';
+        }
+    }
+
+    function doLogout() {
+        sessionStorage.clear();
+        currentUser = null;
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('loginError').innerHTML = '';
+    }
+
+    document.getElementById('roleSelect').addEventListener('change', function() {
+        const role = this.value;
+        if (role === 'admin') {
+            document.getElementById('username').value = 'sipho@sims.com';
+            document.getElementById('password').value = 'sipho123';
+        } else if (role === 'socialworker') {
+            document.getElementById('username').value = 'worker@sims.com';
+            document.getElementById('password').value = 'worker123';
+        } else {
+            document.getElementById('username').value = 'responder@sims.com';
+            document.getElementById('password').value = 'responder123';
+        }
+    });
+
+    document.getElementById('roleSelect').value = 'admin';
+    document.getElementById('username').value = 'sipho@sims.com';
+    document.getElementById('password').value = 'sipho123';
+
+    // ==================== NAVIGATION ====================
+    function renderNav() {
+        const nav = document.getElementById('bottomNav');
+        const fab = document.getElementById('fabBtn');
+        
+        if (currentUser.role === 'admin') {
+            nav.innerHTML = '<button class="nav-btn" data-page="dashboard"><i class="fas fa-home"></i><span>Home</span></button>' +
+                '<button class="nav-btn" data-page="children"><i class="fas fa-child"></i><span>Children</span></button>' +
+                '<button class="nav-btn" data-page="incident"><i class="fas fa-exclamation-triangle"></i><span>Report</span></button>' +
+                '<button class="nav-btn" data-page="stock"><i class="fas fa-boxes"></i><span>Stock</span></button>' +
+                '<button class="nav-btn" data-page="responder"><i class="fas fa-bolt"></i><span>Responder</span></button>' +
+                '<button class="nav-btn" data-page="reports"><i class="fas fa-chart-pie"></i><span>Reports</span></button>';
+            fab.style.display = 'flex';
+        } else if (currentUser.role === 'socialworker') {
+            nav.innerHTML = '<button class="nav-btn" data-page="dashboard"><i class="fas fa-home"></i><span>Home</span></button>' +
+                '<button class="nav-btn" data-page="children"><i class="fas fa-child"></i><span>Children</span></button>' +
+                '<button class="nav-btn" data-page="incident"><i class="fas fa-exclamation-triangle"></i><span>Report</span></button>' +
+                '<button class="nav-btn" data-page="stock"><i class="fas fa-boxes"></i><span>Stock</span></button>' +
+                '<button class="nav-btn" data-page="reports"><i class="fas fa-chart-pie"></i><span>Reports</span></button>';
+            fab.style.display = 'flex';
+        } else {
+            nav.innerHTML = '<button class="nav-btn" data-page="dashboard"><i class="fas fa-home"></i><span>Home</span></button>' +
+                '<button class="nav-btn" data-page="incident"><i class="fas fa-exclamation-triangle"></i><span>Incidents</span></button>' +
+                '<button class="nav-btn" data-page="responder"><i class="fas fa-bolt"></i><span>My Tasks</span></button>' +
+                '<button class="nav-btn" data-page="reports"><i class="fas fa-chart-pie"></i><span>Reports</span></button>';
+            fab.style.display = 'none';
+        }
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => renderScreen(btn.getAttribute('data-page')));
+        });
+    }
+
+    function renderScreen(screen) {
+        currentScreen = screen;
+        const container = document.getElementById('mainContent');
+        const fab = document.getElementById('fabBtn');
+        
+        if (screen === 'dashboard') renderDashboard(container);
+        else if (screen === 'children') renderChildren(container, fab);
+        else if (screen === 'incident') renderIncident(container);
+        else if (screen === 'stock') renderStock(container, fab);
+        else if (screen === 'responder') renderResponder(container);
+        else if (screen === 'reports') renderReports(container);
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            if (btn.getAttribute('data-page') === screen) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+    }
+
+    // ==================== DASHBOARD ====================
+    function renderDashboard(container) {
+        const beneficiaries = getData('beneficiaries');
+        const incidents = getData('incidents');
+        const inventory = getData('inventory');
+        const pendingTasks = incidents.filter(function(i) { return i.status === 'pending'; }).length;
+        const urgent = incidents.filter(function(i) { return i.priority === 'Urgent' && i.status === 'pending'; }).length;
+        const lowStock = inventory.filter(function(i) { return i.quantity <= i.reorderLevel; }).length;
+        
+        let recentHtml = '';
+        for (var i = 0; i < Math.min(3, incidents.length); i++) {
+            recentHtml += '<div class="list-item"><div><strong>' + incidents[i].childName + '</strong><br>' + incidents[i].type + '<br><small>' + new Date(incidents[i].date).toLocaleDateString() + '</small></div><span class="status-badge status-' + incidents[i].status + '">' + incidents[i].status + '</span></div>';
+        }
+        
+        container.innerHTML = '<div class="stats-grid">' +
+            '<div class="stat-card"><i class="fas fa-child"></i><h3>' + beneficiaries.length + '</h3><p>Children</p></div>' +
+            '<div class="stat-card"><i class="fas fa-bell"></i><h3>' + pendingTasks + '</h3><p>Pending Tasks</p></div>' +
+            '<div class="stat-card"><i class="fas fa-exclamation-triangle"></i><h3>' + urgent + '</h3><p>Urgent</p></div>' +
+            '<div class="stat-card"><i class="fas fa-boxes"></i><h3>' + lowStock + '</h3><p>Low Stock</p></div>' +
+            '</div>' +
+            (urgent > 0 ? '<div class="alert-badge"><i class="fas fa-ambulance"></i> <strong>' + urgent + ' urgent incident(s)</strong> require immediate responder attention!</div>' : '') +
+            '<div class="card"><h4>Recent Incidents</h4>' + (recentHtml || '<p>No incidents</p>') + '</div>' +
+            '<footer>Offline-first | POPIA Compliant</footer>';
+    }
+
+    // ==================== CHILDREN MANAGEMENT ====================
+    function renderChildren(container, fab) {
+        const children = getData('beneficiaries');
+        
+        let listHtml = '';
+        for (var i = 0; i < children.length; i++) {
+            listHtml += '<div class="list-item">' +
+                '<div onclick="viewChild(\'' + children[i].id + '\')" style="flex:1; cursor:pointer;"><strong>' + children[i].firstName + ' ' + children[i].lastName + '</strong><br><small>ID: ' + children[i].id + ' | Guardian: ' + children[i].guardian + '</small></div>' +
+                '<div><button class="edit-btn" onclick="editChild(\'' + children[i].id + '\')"><i class="fas fa-edit"></i></button><button class="delete-btn" onclick="deleteChild(\'' + children[i].id + '\')"><i class="fas fa-trash"></i></button></div>' +
+                '</div>';
+        }
+        
+        container.innerHTML = '<div class="card"><h4><i class="fas fa-list"></i> Registered Children (' + children.length + ')</h4><div id="childrenList">' + (listHtml || '<p>No children found.</p>') + '</div></div>';
+        
+        fab.onclick = function() { showAddChildModal(); };
+    }
+
+    function showAddChildModal() {
+        const modalHtml = '<div><h3 style="margin-bottom: 16px;">Register New Child</h3>' +
+            '<div class="form-group"><label>First Name *</label><input id="firstName" placeholder="Enter first name"></div>' +
+            '<div class="form-group"><label>Last Name *</label><input id="lastName" placeholder="Enter last name"></div>' +
+            '<div class="form-group"><label>Date of Birth</label><input type="date" id="dob"></div>' +
+            '<div class="form-group"><label>Guardian Name</label><input id="guardianName" placeholder="Guardian name"></div>' +
+            '<div class="form-group"><label>Guardian Contact</label><input id="contact" placeholder="Phone number"></div>' +
+            '<div class="form-group"><label>Address *</label><input id="address" placeholder="Full address"></div>' +
+            '<button class="btn-primary" onclick="saveChild()">Register Child</button>' +
+            '<button onclick="closeModal()" style="margin-top:10px; background:#ccc; border:none; padding:10px; border-radius:30px; width:100%;">Cancel</button></div>';
+        showModal("Add New Child", modalHtml);
+    }
+
+    window.saveChild = function() {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const address = document.getElementById('address').value.trim();
+        
+        if (!firstName || !lastName) { alert("First name and last name are required!"); return; }
+        if (!address) { alert("Address is required!"); return; }
+        
+        const children = getData('beneficiaries');
+        const newId = "B" + String(children.length + 101).padStart(3, '0');
+        
+        children.push({
+            id: newId,
+            firstName: firstName,
+            lastName: lastName,
+            dob: document.getElementById('dob').value || '',
+            guardian: document.getElementById('guardianName').value || '',
+            contact: document.getElementById('contact').value || '',
+            address: address,
+            regDate: new Date().toISOString(),
+            registeredBy: currentUser.id
+        });
+        
+        setData('beneficiaries', children);
+        closeModal();
+        renderScreen('children');
+        alert('Child registered successfully!');
+    };
+
+    window.editChild = function(childId) {
+        const children = getData('beneficiaries');
+        const child = children.find(function(c) { return c.id === childId; });
+        
+        const modalHtml = '<div><h3>Edit Child Information</h3>' +
+            '<div class="form-group"><label>First Name</label><input id="firstName" value="' + child.firstName + '"></div>' +
+            '<div class="form-group"><label>Last Name</label><input id="lastName" value="' + child.lastName + '"></div>' +
+            '<div class="form-group"><label>Date of Birth</label><input type="date" id="dob" value="' + (child.dob || '') + '"></div>' +
+            '<div class="form-group"><label>Guardian Name</label><input id="guardianName" value="' + (child.guardian || '') + '"></div>' +
+            '<div class="form-group"><label>Guardian Contact</label><input id="contact" value="' + (child.contact || '') + '"></div>' +
+            '<div class="form-group"><label>Address</label><input id="address" value="' + (child.address || '') + '"></div>' +
+            '<button class="btn-primary" onclick="updateChild(\'' + childId + '\')">Update Child</button>' +
+            '<button onclick="closeModal()" style="margin-top:10px; background:#ccc; border:none; padding:10px; border-radius:30px;">Cancel</button></div>';
+        showModal("Edit Child", modalHtml);
+    };
+
+    window.updateChild = function(childId) {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        
+        if (!firstName || !lastName) { alert("First name and last name are required!"); return; }
+        
+        const children = getData('beneficiaries');
+        for (var i = 0; i < children.length; i++) {
+            if (children[i].id === childId) {
+                children[i].firstName = firstName;
+                children[i].lastName = lastName;
+                children[i].dob = document.getElementById('dob').value || children[i].dob;
+                children[i].guardian = document.getElementById('guardianName').value || children[i].guardian;
+                children[i].contact = document.getElementById('contact').value || children[i].contact;
+                children[i].address = document.getElementById('address').value || children[i].address;
+                break;
+            }
+        }
+        setData('beneficiaries', children);
+        closeModal();
+        renderScreen('children');
+        alert('Child updated successfully!');
+    };
+
+    window.deleteChild = function(childId) {
+        const children = getData('beneficiaries');
+        const child = children.find(function(c) { return c.id === childId; });
+        if (confirm('Delete ' + child.firstName + ' ' + child.lastName + '?')) {
+            const newChildren = children.filter(function(c) { return c.id !== childId; });
+            setData('beneficiaries', newChildren);
+            renderScreen('children');
+            alert('Child deleted.');
+        }
+    };
+
+    window.viewChild = function(childId) {
+        const children = getData('beneficiaries');
+        const child = children.find(function(c) { return c.id === childId; });
+        const notes = getData('caseNotes').filter(function(n) { return n.childId === childId; });
+        
+        let notesHtml = '';
+        for (var i = 0; i < notes.length; i++) {
+            notesHtml += '<div><small>' + new Date(notes[i].date).toLocaleDateString() + '</small><br>' + notes[i].note + '</div><hr>';
+        }
+        
+        const modalHtml = '<div><h3>' + child.firstName + ' ' + child.lastName + '</h3>' +
+            '<p><strong>ID:</strong> ' + child.id + '<br><strong>DOB:</strong> ' + (child.dob || 'N/A') + '<br><strong>Guardian:</strong> ' + (child.guardian || 'N/A') + '<br><strong>Contact:</strong> ' + (child.contact || 'N/A') + '<br><strong>Address:</strong> ' + (child.address || 'N/A') + '</p><hr>' +
+            '<h4>Case Notes</h4><textarea id="newNote" placeholder="Add case note..." rows="2" style="width:100%; margin-bottom:8px; padding:10px; border-radius:16px; border:1px solid #ddd;"></textarea>' +
+            '<button class="btn-primary" onclick="addNote(\'' + childId + '\')">Add Note</button><div id="notesList">' + (notesHtml || '<i>No notes yet</i>') + '</div>' +
+            '<button onclick="closeModal()" style="margin-top:12px; background:#ccc; border:none; padding:8px; border-radius:20px;">Close</button></div>';
+        showModal("Child Profile", modalHtml);
+    };
+
+    window.addNote = function(childId) {
+        const note = document.getElementById('newNote').value;
+        if (!note) { alert("Please enter a note"); return; }
+        
+        let notes = getData('caseNotes');
+        notes.push({ id: Date.now(), childId: childId, note: note, date: new Date().toISOString(), staffId: currentUser.id });
+        setData('caseNotes', notes);
+        closeModal();
+        viewChild(childId);
+        alert("Case note added!");
+    };
+
+    // ==================== INCIDENT REPORTING ====================
+    function renderIncident(container) {
+        const children = getData('beneficiaries');
+        
+        let optionsHtml = '<option value="">Select Child</option>';
+        for (var i = 0; i < children.length; i++) {
+            optionsHtml += '<option value="' + children[i].id + '" data-address="' + (children[i].address || '') + '">' + children[i].firstName + ' ' + children[i].lastName + '</option>';
+        }
+        
+        container.innerHTML = '<div class="card"><h3>Report New Incident</h3>' +
+            '<div class="form-group"><label>Select Child *</label><select id="incidentChild">' + optionsHtml + '</select></div>' +
+            '<div class="form-group"><label>Incident Type *</label><input id="incidentType" placeholder="e.g., Physical Abuse, Neglect"></div>' +
+            '<div class="form-group"><label>Priority *</label><select id="incidentPriority"><option value="Low">Low - Monitor</option><option value="High">High - Today</option><option value="Urgent" selected>URGENT - Immediate</option></select></div>' +
+            '<div class="form-group"><label>Location (Auto-fills from child address)</label><input id="incidentLocation" placeholder="Location will auto-fill" readonly style="background:#f5f5f5;"></div>' +
+            '<div class="form-group"><label>Description *</label><textarea id="incidentDesc" rows="3" placeholder="Describe the incident..."></textarea></div>' +
+            '<button class="btn-primary btn-danger" onclick="reportIncident()">Submit Incident Report</button></div>' +
+            '<div class="card"><h4>My Reported Incidents</h4><div id="myIncidentsList"></div></div>';
+        
+        const childSelect = document.getElementById('incidentChild');
+        const locationInput = document.getElementById('incidentLocation');
+        
+        childSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const childAddress = selectedOption.getAttribute('data-address');
+            if (childAddress && childAddress !== '') {
+                locationInput.value = childAddress;
+            } else {
+                locationInput.value = '';
+                alert('This child has no registered address. Please update child profile first.');
+            }
+        });
+        
+        const incidents = getData('incidents');
+        let myIncidentsHtml = '';
+        for (var i = 0; i < incidents.length; i++) {
+            if (incidents[i].reportedBy === currentUser.id || currentUser.role === 'admin') {
+                myIncidentsHtml += '<div class="incident-card"><div style="display:flex;justify-content:space-between;"><strong>' + incidents[i].childName + '</strong><span class="status-badge status-' + incidents[i].status + '">' + incidents[i].status.toUpperCase() + '</span></div>' +
+                    '<div>' + incidents[i].type + '</div><div>' + incidents[i].location + '</div><div>' + new Date(incidents[i].date).toLocaleString() + '</div>' +
+                    (incidents[i].acceptedByName ? '<div>Accepted by: ' + incidents[i].acceptedByName + '</div>' : '') +
+                    (incidents[i].resolutionNotes ? '<div>Resolution: ' + incidents[i].resolutionNotes + '</div>' : '') +
+                    (currentUser.role === 'admin' ? '<button class="delete-incident-btn" onclick="deleteIncident(' + incidents[i].id + ')">Delete</button>' : '') + '</div>';
+            }
+        }
+        document.getElementById('myIncidentsList').innerHTML = myIncidentsHtml || '<p>No incidents reported yet.</p>';
+    }
+
+    window.reportIncident = function() {
+        const childId = document.getElementById('incidentChild').value;
+        const type = document.getElementById('incidentType').value.trim();
+        const priority = document.getElementById('incidentPriority').value;
+        const location = document.getElementById('incidentLocation').value;
+        const description = document.getElementById('incidentDesc').value.trim();
+        
+        if (!childId) { alert("Please select a child"); return; }
+        if (!type) { alert("Please enter incident type"); return; }
+        if (!description) { alert("Please enter description"); return; }
+        if (!location) { alert("Please ensure child has a registered address"); return; }
+        
+        const children = getData('beneficiaries');
+        let child = null;
+        for (var i = 0; i < children.length; i++) {
+            if (children[i].id === childId) { child = children[i]; break; }
+        }
+        
+        const incidents = getData('incidents');
+        const newIncident = {
+            id: Date.now(),
+            childId: childId,
+            childName: child.firstName + ' ' + child.lastName,
+            type: type,
+            priority: priority,
+            status: "pending",
+            date: new Date().toISOString(),
+            location: location,
+            description: description,
+            reportedBy: currentUser.id,
+            reportedByName: currentUser.name
+        };
+        
+        incidents.unshift(newIncident);
+        setData('incidents', incidents);
+        
+        document.getElementById('incidentType').value = '';
+        document.getElementById('incidentDesc').value = '';
+        
+        alert('Incident reported for ' + child.firstName + ' ' + child.lastName + '! ' + (priority === 'Urgent' ? 'URGENT - Responders notified!' : ''));
+        renderScreen('incident');
+    };
+
+    // ==================== RESPONDER HUB (FIXED) ====================
+    function renderResponder(container) {
+        const incidents = getData('incidents');
+        const pendingIncidents = incidents.filter(function(i) { return i.status === 'pending'; });
+        const acceptedIncidents = incidents.filter(function(i) { return i.status === 'accepted'; });
+        const resolvedIncidents = incidents.filter(function(i) { return i.status === 'resolved'; });
+        
+        container.innerHTML = '<div class="card" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">' +
+            '<h3><i class="fas fa-bell"></i> Responder Dashboard</h3>' +
+            '<div style="display: flex; justify-content: space-between; margin-top: 12px;">' +
+            '<div><strong>' + pendingIncidents.length + '</strong> Pending</div>' +
+            '<div><strong>' + acceptedIncidents.length + '</strong> In Progress</div>' +
+            '<div><strong>' + resolvedIncidents.length + '</strong> Resolved</div>' +
+            '</div></div>' +
+            '<div class="card"><h4>Pending Incidents (' + pendingIncidents.length + ')</h4><div id="pendingIncidentsList"></div></div>' +
+            '<div class="card"><h4>In Progress (' + acceptedIncidents.length + ')</h4><div id="acceptedIncidentsList"></div></div>' +
+            '<div class="card"><h4>Resolved (' + resolvedIncidents.length + ')</h4><div id="resolvedIncidentsList"></div></div>';
+        
+        // Pending Incidents
+        let pendingHtml = '';
+        if (pendingIncidents.length === 0) {
+            pendingHtml = '<p>No pending incidents. Good work!</p>';
+        } else {
+            for (var i = 0; i < pendingIncidents.length; i++) {
+                var inc = pendingIncidents[i];
+                pendingHtml += '<div class="incident-card">' +
+                    '<div style="display:flex;justify-content:space-between;"><strong>' + inc.childName + '</strong><span class="status-badge status-pending">PENDING</span></div>' +
+                    '<div style="margin-top:6px;">Type: ' + inc.type + '</div>' +
+                    '<div>Location: ' + inc.location + '</div>' +
+                    '<div>Reported by: ' + (inc.reportedByName || 'Social Worker') + ' on ' + new Date(inc.date).toLocaleString() + '</div>' +
+                    '<div>Description: ' + inc.description + '</div>' +
+                    '<div style="margin-top:10px;">' +
+                    '<button class="action-btn" onclick="acceptIncident(' + inc.id + ')">Accept & Respond</button>' +
+                    '<button class="action-btn" onclick="viewIncidentDetails(' + inc.id + ')">View Details</button>' +
+                    '<button class="delete-incident-btn" onclick="deleteIncident(' + inc.id + ')">Delete</button>' +
+                    '</div></div>';
+            }
+        }
+        document.getElementById('pendingIncidentsList').innerHTML = pendingHtml;
+        
+        // Accepted Incidents
+        let acceptedHtml = '';
+        if (acceptedIncidents.length === 0) {
+            acceptedHtml = '<p>No incidents in progress.</p>';
+        } else {
+            for (var i = 0; i < acceptedIncidents.length; i++) {
+                var inc = acceptedIncidents[i];
+                acceptedHtml += '<div class="incident-card" style="border-left-color: #3498db;">' +
+                    '<div style="display:flex;justify-content:space-between;"><strong>' + inc.childName + '</strong><span class="status-badge status-accepted">IN PROGRESS</span></div>' +
+                    '<div>Type: ' + inc.type + '</div>' +
+                    '<div>Location: ' + inc.location + '</div>' +
+                    '<div>Accepted by: ' + (inc.acceptedByName || 'Responder') + '</div>' +
+                    '<div style="margin-top:10px;">' +
+                    '<button class="action-btn" onclick="resolveIncident(' + inc.id + ')">Mark Resolved</button>' +
+                    '<button class="action-btn" onclick="viewIncidentDetails(' + inc.id + ')">View Details</button>' +
+                    (currentUser.role === 'admin' ? '<button class="delete-incident-btn" onclick="deleteIncident(' + inc.id + ')">Delete</button>' : '') +
+                    '</div></div>';
+            }
+        }
+        document.getElementById('acceptedIncidentsList').innerHTML = acceptedHtml;
+        
+        // Resolved Incidents
+        let resolvedHtml = '';
+        if (resolvedIncidents.length === 0) {
+            resolvedHtml = '<p>No resolved incidents yet.</p>';
+        } else {
+            for (var i = 0; i < resolvedIncidents.length; i++) {
+                var inc = resolvedIncidents[i];
+                resolvedHtml += '<div class="incident-card incident-resolved">' +
+                    '<div style="display:flex;justify-content:space-between;"><strong>' + inc.childName + '</strong><span class="status-badge status-resolved">RESOLVED</span></div>' +
+                    '<div>Type: ' + inc.type + '</div>' +
+                    '<div>Location: ' + inc.location + '</div>' +
+                    '<div>Resolved: ' + new Date(inc.resolvedAt || inc.date).toLocaleDateString() + '</div>' +
+                    (inc.resolutionNotes ? '<div>Notes: ' + inc.resolutionNotes + '</div>' : '') +
+                    (currentUser.role === 'admin' ? '<button class="delete-incident-btn" onclick="deleteIncident(' + inc.id + ')">Delete</button>' : '') +
+                    '</div>';
+            }
+        }
+        document.getElementById('resolvedIncidentsList').innerHTML = resolvedHtml;
+    }
+
+    // ==================== INCIDENT ACTIONS ====================
+    window.acceptIncident = function(incidentId) {
+        const incidents = getData('incidents');
+        let incident = null;
+        for (var i = 0; i < incidents.length; i++) {
+            if (incidents[i].id === incidentId) { incident = incidents[i]; break; }
+        }
+        
+        if (incident && incident.status === 'pending') {
+            incident.status = 'accepted';
+            incident.acceptedBy = currentUser.id;
+            incident.acceptedByName = currentUser.name;
+            incident.acceptedAt = new Date().toISOString();
+            setData('incidents', incidents);
+            
+            alert('You have accepted the incident for ' + incident.childName + '. Please proceed to: ' + incident.location);
+            renderScreen('responder');
+            renderScreen('dashboard');
+        }
+    };
+
+    window.resolveIncident = function(incidentId) {
+        const incidents = getData('incidents');
+        let incident = null;
+        for (var i = 0; i < incidents.length; i++) {
+            if (incidents[i].id === incidentId) { incident = incidents[i]; break; }
+        }
+        
+        if (incident) {
+            const resolutionNotes = prompt("Enter resolution notes:", "Child safe, situation resolved");
+            if (resolutionNotes !== null) {
+                incident.status = 'resolved';
+                incident.resolvedAt = new Date().toISOString();
+                incident.resolutionNotes = resolutionNotes;
+                incident.resolvedBy = currentUser.id;
+                setData('incidents', incidents);
+                
+                alert('Incident for ' + incident.childName + ' marked as resolved.');
+                renderScreen('responder');
+                renderScreen('dashboard');
+            }
+        }
+    };
+
+    window.deleteIncident = function(incidentId) {
+        const incidents = getData('incidents');
+        let incident = null;
+        for (var i = 0; i < incidents.length; i++) {
+            if (incidents[i].id === incidentId) { incident = incidents[i]; break; }
+        }
+        
+        if (incident) {
+            if (confirm('Delete incident for ' + incident.childName + '?')) {
+                const newIncidents = incidents.filter(function(i) { return i.id !== incidentId; });
+                setData('incidents', newIncidents);
+                alert('Incident deleted.');
+                renderScreen(currentScreen);
+            }
+        }
+    };
+
+    window.viewIncidentDetails = function(incidentId) {
+        const incidents = getData('incidents');
+        let incident = null;
+        for (var i = 0; i < incidents.length; i++) {
+            if (incidents[i].id === incidentId) { incident = incidents[i]; break; }
+        }
+        
+        if (incident) {
+            const modalHtml = '<div><h3>Incident Details</h3>' +
+                '<p><strong>Child:</strong> ' + incident.childName + '</p>' +
+                '<p><strong>Type:</strong> ' + incident.type + '</p>' +
+                '<p><strong>Priority:</strong> ' + incident.priority + '</p>' +
+                '<p><strong>Location:</strong> ' + incident.location + '</p>' +
+                '<p><strong>Reported:</strong> ' + new Date(incident.date).toLocaleString() + '</p>' +
+                '<p><strong>Reported by:</strong> ' + (incident.reportedByName || 'Social Worker') + '</p>' +
+                '<p><strong>Description:</strong> ' + incident.description + '</p>' +
+                (incident.acceptedAt ? '<p><strong>Accepted by:</strong> ' + incident.acceptedByName + ' at ' + new Date(incident.acceptedAt).toLocaleString() + '</p>' : '') +
+                (incident.resolutionNotes ? '<p><strong>Resolution:</strong> ' + incident.resolutionNotes + '</p>' : '') +
+                '<button onclick="closeModal()" style="margin-top:12px; background:#2c3e50; border:none; padding:10px; border-radius:30px; color:white;">Close</button></div>';
+            showModal("Incident Details", modalHtml);
+        }
+    };
+
+    // ==================== STOCK MANAGEMENT ====================
+    function renderStock(container, fab) {
+        const inventory = getData('inventory');
+        
+        let listHtml = '';
+        for (var i = 0; i < inventory.length; i++) {
+            listHtml += '<div class="list-item"><div><strong>' + inventory[i].item + '</strong><br>Stock: ' + inventory[i].quantity + ' | Reorder: ' + inventory[i].reorderLevel + '</div>' +
+                '<div><button onclick="useStock(\'' + inventory[i].id + '\')" style="background:#e67e22; border:none; padding:6px 12px; border-radius:20px; color:white; margin-right:6px;">Use 10</button>' +
+                '<button onclick="restock(\'' + inventory[i].id + '\')" style="background:#27ae60; border:none; padding:6px 12px; border-radius:20px; color:white;">+50</button></div></div>';
+        }
+        
+        container.innerHTML = '<div class="card"><h4>Current Inventory</h4><div id="inventoryList">' + (listHtml || '<p>No items. Tap + to add.</p>') + '</div></div>';
+        
+        fab.onclick = function() {
+            const itemName = prompt("Enter item name:");
+            if (!itemName) return;
+            const quantity = parseInt(prompt("Enter quantity:", "50"));
+            const reorderLevel = parseInt(prompt("Reorder level:", "20"));
+            const inventory = getData('inventory');
+            inventory.push({ id: "R" + Date.now(), item: itemName, quantity: quantity || 50, reorderLevel: reorderLevel || 20 });
+            setData('inventory', inventory);
+            renderScreen('stock');
+            alert(itemName + ' added!');
+        };
+    }
+
+    window.useStock = function(id) {
+        let inventory = getData('inventory');
+        for (var i = 0; i < inventory.length; i++) {
+            if (inventory[i].id === id && inventory[i].quantity >= 10) {
+                inventory[i].quantity -= 10;
+                setData('inventory', inventory);
+                renderScreen('stock');
+                alert('Used 10 ' + inventory[i].item + '. Remaining: ' + inventory[i].quantity);
+                return;
+            }
+        }
+        alert("Insufficient stock!");
+    };
+
+    window.restock = function(id) {
+        let inventory = getData('inventory');
+        for (var i = 0; i < inventory.length; i++) {
+            if (inventory[i].id === id) {
+                inventory[i].quantity += 50;
+                setData('inventory', inventory);
+                renderScreen('stock');
+                alert('Restocked +50 ' + inventory[i].item + '. New quantity: ' + inventory[i].quantity);
+                return;
+            }
+        }
+    };
+
+    // ==================== REPORTS ====================
+    function renderReports(container) {
+        const children = getData('beneficiaries');
+        let incidents = getData('incidents');
+        if (currentUser.role === 'socialworker') {
+            incidents = incidents.filter(function(i) { return i.reportedBy === currentUser.id; });
+        }
+        const resolved = incidents.filter(function(i) { return i.status === 'resolved'; }).length;
+        
+        container.innerHTML = '<div class="stats-grid">' +
+            '<div class="stat-card"><i class="fas fa-child"></i><h3>' + children.length + '</h3><p>Children</p></div>' +
+            '<div class="stat-card"><i class="fas fa-bell"></i><h3>' + incidents.length + '</h3><p>Total Incidents</p></div>' +
+            '<div class="stat-card"><i class="fas fa-check-circle"></i><h3>' + resolved + '</h3><p>Resolved</p></div>' +
+            '<div class="stat-card"><i class="fas fa-clock"></i><h3>' + (incidents.length - resolved) + '</h3><p>Active</p></div>' +
+            '</div>' +
+            '<div class="card"><h4>Incident Stats</h4><p>Resolution rate: ' + (incidents.length ? Math.round(resolved / incidents.length * 100) : 0) + '%</p>' +
+            '<p>Urgent: ' + incidents.filter(function(i) { return i.priority === 'Urgent'; }).length + '</p>' +
+            '<p>Resolved: ' + resolved + '</p></div>' +
+            '<div class="card"><button class="btn-primary" onclick="generateReport()">Donor Impact Report</button>' +
+            '<button class="btn-success" onclick="exportIncidentReport()" style="margin-top:10px;">Export Incident Report</button></div>';
+    }
+
+    window.generateReport = function() {
+        const children = getData('beneficiaries');
+        let incidents = getData('incidents');
+        if (currentUser.role === 'socialworker') {
+            incidents = incidents.filter(function(i) { return i.reportedBy === currentUser.id; });
+        }
+        alert('SACHIF SIMS REPORT\n\nChildren: ' + children.length + '\nIncidents: ' + incidents.length + '\nResolved: ' + incidents.filter(function(i) { return i.status === 'resolved'; }).length);
+    };
+
+    window.exportIncidentReport = function() {
+        let incidents = getData('incidents');
+        if (currentUser.role === 'socialworker') {
+            incidents = incidents.filter(function(i) { return i.reportedBy === currentUser.id; });
+        }
+        alert('Exporting ' + incidents.length + ' incidents to CSV...');
+    };
+
+    // ==================== MODAL HELPER ====================
+    function showModal(title, contentHtml) {
+        closeModal();
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = '<div class="modal-content"><div style="font-weight: bold; font-size: 1.2rem; margin-bottom: 12px;">' + title + '</div><div>' + contentHtml + '</div></div>';
+        document.body.appendChild(modal);
+    }
+
+    window.closeModal = function() {
+        const modal = document.querySelector('.modal');
+        if (modal) modal.remove();
+    };
+
+    // ==================== CHECK SESSION ====================
+    function checkSession() {
+        const saved = sessionStorage.getItem('currentUser');
+        if (saved) {
+            currentUser = JSON.parse(saved);
+            initData();
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'flex';
+            document.getElementById('roleBadge').innerHTML = currentUser.role === 'admin' ? 'Admin' : (currentUser.role === 'socialworker' ? 'Social Worker' : 'Responder');
+            document.getElementById('welcomeBanner').innerHTML = '<h3>Welcome, ' + currentUser.name + '!</h3>';
+            renderNav();
+            renderScreen('dashboard');
+        }
+    }
+
+    initData();
+    checkSession();
+</script>
+</body>
+</html>
